@@ -9,9 +9,4 @@
 
     <color name="dialog_line">#2c000000</color>
 
-    <!--背景颜色-->
-    <color name="bg_main">#f1f1f1</color>
-    <color name="z_transparent">#00000000</color>
-    <color name="z_dialog_bg_color">#FFFFFF</color>
-
 </resources>

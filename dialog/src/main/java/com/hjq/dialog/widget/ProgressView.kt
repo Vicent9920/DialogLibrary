@@ -1,4 +1,4 @@
-package com.vincent.dialoglibrary.widget
+package com.hjq.dialog.widget
 
 import android.content.Context
 import android.graphics.*
@@ -15,6 +15,9 @@ import android.view.animation.Interpolator
 import androidx.annotation.NonNull
 import androidx.core.content.ContextCompat
 import com.hjq.dialog.R
+import kotlin.math.floor
+import kotlin.math.max
+import kotlin.math.min
 
 
 /**
@@ -24,10 +27,9 @@ import com.hjq.dialog.R
  * QQ：3332168769
  * 备注：
  */
-const val MODE_DETERMINATE = 0
-const val MODE_INDETERMINATE = 1
+
 open class ProgressView(context: Context, attrs: AttributeSet) : View(context, attrs) {
-    private var circularProgressDrawable: CircularProgressDrawable? = null
+    private lateinit var circularProgressDrawable: CircularProgressDrawable
 
     private var isStart = false
     private var isAutoStart = true
@@ -55,7 +57,7 @@ open class ProgressView(context: Context, attrs: AttributeSet) : View(context, a
      * set the stroke size with px
      */
     fun setStrokeSizePx(px: Int) {
-        circularProgressDrawable!!.setStrokeSize(px)
+        circularProgressDrawable.setStrokeSize(px)
     }
 
     /**
@@ -63,14 +65,14 @@ open class ProgressView(context: Context, attrs: AttributeSet) : View(context, a
      */
     fun setStrokeSizeDp(context: Context, dp: Float) {
         val px = dipToPixels(context, dp)
-        circularProgressDrawable!!.setStrokeSize(px)
+        circularProgressDrawable.setStrokeSize(px)
     }
 
     /**
      * set the colors with int[]
      */
     fun setStrokeColors(strokeColors: IntArray) {
-        circularProgressDrawable!!.setStrokeColors(strokeColors)
+        circularProgressDrawable.setStrokeColors(strokeColors)
     }
 
     override fun onAttachedToWindow() {
@@ -82,7 +84,7 @@ open class ProgressView(context: Context, attrs: AttributeSet) : View(context, a
 
     override fun onVisibilityChanged(@NonNull changedView: View, visibility: Int) {
         super.onVisibilityChanged(changedView, visibility)
-        if (visibility == View.GONE || visibility == View.INVISIBLE && isStart) {
+        if (visibility == GONE || visibility == INVISIBLE && isStart) {
             stop()
         } else {
             if (isAutoStart) {
@@ -92,7 +94,7 @@ open class ProgressView(context: Context, attrs: AttributeSet) : View(context, a
     }
 
     override fun onDetachedFromWindow() {
-        if (isStart && visibility == View.VISIBLE) {
+        if (isStart && visibility == VISIBLE) {
             stop()
         }
         super.onDetachedFromWindow()
@@ -102,20 +104,16 @@ open class ProgressView(context: Context, attrs: AttributeSet) : View(context, a
      * Start showing progress.
      */
     fun start() {
-        if (circularProgressDrawable != null) {
-            circularProgressDrawable!!.start()
-            isStart = true
-        }
+        circularProgressDrawable.start()
+        isStart = true
     }
 
     /**
      * Stop showing progress.
      */
     fun stop() {
-        if (circularProgressDrawable != null && isStart) {
-            circularProgressDrawable!!.stop()
-            isStart = false
-        }
+        circularProgressDrawable.stop()
+        isStart = false
     }
 
     /**
@@ -133,7 +131,7 @@ open class ProgressView(context: Context, attrs: AttributeSet) : View(context, a
         private val mMaxSweepAngle: Float,
         private val mMinSweepAngle: Float,
         private var mStrokeSize: Int,
-        private var mStrokeColors: IntArray?,
+        private  var mStrokeColors: IntArray,
         private val mReverse: Boolean,
         private val mRotateDuration: Int,
         private val mTransformDuration: Int,
@@ -162,16 +160,13 @@ open class ProgressView(context: Context, attrs: AttributeSet) : View(context, a
 
         private val indeterminateStrokeColor: Int
             get() {
-                if (mProgressState != PROGRESS_STATE_KEEP_SHRINK || mStrokeColors!!.size == 1)
-                    return mStrokeColors!![mStrokeColorIndex]
+                if (mProgressState != PROGRESS_STATE_KEEP_SHRINK || mStrokeColors.size == 1)
+                    return mStrokeColors[mStrokeColorIndex]
 
-                val value = Math.max(
-                    0f,
-                    Math.min(1f, (SystemClock.uptimeMillis() - mLastProgressStateTime).toFloat() / mKeepDuration)
-                )
-                val index = if (mStrokeColorIndex == 0) mStrokeColors!!.size - 1 else mStrokeColorIndex - 1
+                val value = max(0f, min(1f, (SystemClock.uptimeMillis() - mLastProgressStateTime).toFloat() / mKeepDuration))
+                val index = if (mStrokeColorIndex == 0) mStrokeColors.size - 1 else mStrokeColorIndex - 1
 
-                return ColorUtil.getMiddleColor(mStrokeColors!![index], mStrokeColors!![mStrokeColorIndex], value)
+                return ColorUtil.getMiddleColor(mStrokeColors[index], mStrokeColors[mStrokeColorIndex], value)
             }
 
         private val mUpdater = Runnable { update() }
@@ -201,9 +196,9 @@ open class ProgressView(context: Context, attrs: AttributeSet) : View(context, a
                 val steps = time / stepTime
 
                 var outerRadius = 0f
-                var innerRadius = 0f
+                var innerRadius:Float
 
-                for (i in Math.floor(steps.toDouble()).toInt() downTo 0) {
+                for (i in floor(steps.toDouble()).toInt() downTo 0) {
                     innerRadius = outerRadius
                     outerRadius = Math.min(1f, (steps - i) * mInStepPercent) * maxRadius
 
@@ -360,8 +355,8 @@ open class ProgressView(context: Context, attrs: AttributeSet) : View(context, a
 
         private fun update() {
             when (mProgressMode) {
-                ProgressView.MODE_DETERMINATE -> updateDeterminate()
-                ProgressView.MODE_INDETERMINATE -> updateIndeterminate()
+                MODE_DETERMINATE -> updateDeterminate()
+                MODE_INDETERMINATE -> updateIndeterminate()
             }
         }
 
@@ -447,7 +442,7 @@ open class ProgressView(context: Context, attrs: AttributeSet) : View(context, a
                         mSweepAngle = minAngle
                         mProgressState = PROGRESS_STATE_KEEP_SHRINK
                         mLastProgressStateTime = curTime
-                        mStrokeColorIndex = (mStrokeColorIndex + 1) % mStrokeColors!!.size
+                        mStrokeColorIndex = (mStrokeColorIndex + 1) % mStrokeColors.size
                     }
                 }
                 PROGRESS_STATE_KEEP_SHRINK -> {
@@ -487,15 +482,15 @@ open class ProgressView(context: Context, attrs: AttributeSet) : View(context, a
             private var mMaxSweepAngle: Float = 0.toFloat()
             private var mMinSweepAngle: Float = 0.toFloat()
             private var mStrokeSize: Int = 0
-            private var mStrokeColors: IntArray? = null
+            private lateinit var mStrokeColors: IntArray
             private var mReverse: Boolean = false
             private var mRotateDuration: Int = 0
             private var mTransformDuration: Int = 0
             private var mKeepDuration: Int = 0
-            private var mTransformInterpolator: Interpolator? = null
+            private lateinit var mTransformInterpolator: Interpolator
             private var mProgressMode: Int = 0
             private var mInStepPercent: Float = 0.toFloat()
-            private var mInColors: IntArray? = null
+            private lateinit var mInColors: IntArray
             private var mInAnimationDuration: Int = 0
             private var mOutAnimationDuration: Int = 0
 
@@ -508,7 +503,7 @@ open class ProgressView(context: Context, attrs: AttributeSet) : View(context, a
                     defStyleAttr,
                     defStyleRes
                 )
-                var resId = 0
+                var resId :Int
 
                 padding(
                     a.getDimensionPixelSize(
@@ -568,7 +563,7 @@ open class ProgressView(context: Context, attrs: AttributeSet) : View(context, a
                 progressMode(
                     a.getResourceId(
                         R.styleable.CircularProgressDrawable_pv_progressMode,
-                        ProgressView.MODE_INDETERMINATE
+                        MODE_INDETERMINATE
                     )
                 )
                 //progressMode(a.getInteger(R.styleable.CircularProgressDrawable_pv_progressMode, ProgressView.MODE_INDETERMINATE));
@@ -604,13 +599,13 @@ open class ProgressView(context: Context, attrs: AttributeSet) : View(context, a
             }
 
             fun build(): CircularProgressDrawable {
-                if (mStrokeColors == null)
+                if(mStrokeColors.isEmpty())
                     mStrokeColors = intArrayOf(-0xff6601)
 
-                if (mInColors == null || mInAnimationDuration > 0)
+                if (mInColors.isEmpty() || mInAnimationDuration > 0)
                     mInColors = intArrayOf(-0x4a2b01, -0x211504, -0x50002)
 
-                if (mTransformInterpolator == null)
+
                     mTransformInterpolator = DecelerateInterpolator()
 
                 return CircularProgressDrawable(
@@ -624,11 +619,11 @@ open class ProgressView(context: Context, attrs: AttributeSet) : View(context, a
                     mRotateDuration,
                     mTransformDuration,
                     mKeepDuration,
-                    mTransformInterpolator!!,
+                    mTransformInterpolator,
                     mProgressMode,
                     mInAnimationDuration,
                     mInStepPercent,
-                    mInColors!!,
+                    mInColors,
                     mOutAnimationDuration
                 )
             }
@@ -738,10 +733,7 @@ open class ProgressView(context: Context, attrs: AttributeSet) : View(context, a
         const val FRAME_DURATION = (1000 / 60).toLong()
 
         fun setBackground(v: View, drawable: Drawable?) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN)
-                v.background = drawable
-            else
-                v.setBackgroundDrawable(drawable)
+            v.background = drawable
         }
 
     }

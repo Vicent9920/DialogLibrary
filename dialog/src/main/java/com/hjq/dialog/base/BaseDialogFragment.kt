@@ -1,16 +1,14 @@
-package com.vincent.dialoglibrary.base
+package com.hjq.dialog.base
 
 import android.app.Dialog
 import android.os.Bundle
 import android.os.SystemClock
 import androidx.annotation.NonNull
 import androidx.annotation.Nullable
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentTransaction
-import java.lang.RuntimeException
 
 
 /**
@@ -32,7 +30,7 @@ class BaseDialogFragment : DialogFragment() {
      * 父类同名方法简化
      */
     fun show(fragment: Fragment) {
-        fragment.fragmentManager?:throw RuntimeException("")
+        fragment.fragmentManager ?: throw RuntimeException("")
         show(fragment.fragmentManager!!, fragment::class.java.getName())
 
     }
@@ -46,12 +44,11 @@ class BaseDialogFragment : DialogFragment() {
 
 
     override fun show(transaction: FragmentTransaction, tag: String?): Int {
-        tag?:return -1
+        tag ?: return -1
         return if (!isRepeatedShow(tag)) {
             super.show(transaction, tag)
         } else -1
     }
-
 
 
     /**
@@ -71,7 +68,7 @@ class BaseDialogFragment : DialogFragment() {
         return mDialog
     }
 
-    open class Builder<B : BaseDialog.Builder<B>> (val activity: AppCompatActivity, themeResId: Int = -1) :
+    open class Builder<B : BaseDialog.Builder<B>>(val activity: FragmentActivity, themeResId: Int = -1) :
         BaseDialog.Builder<B>(activity, themeResId) {
 
         private lateinit var mDialogFragment: BaseDialogFragment
@@ -88,7 +85,7 @@ class BaseDialogFragment : DialogFragment() {
             mDialogFragment.dismiss()
         }
 
-        override fun show(): com.vincent.dialoglibrary.base.BaseDialog {
+        override fun show(): BaseDialog {
             val dialog = create()
             mDialogFragment = BaseDialogFragment()
             mDialogFragment.mDialog = dialog

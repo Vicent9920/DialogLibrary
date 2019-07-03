@@ -1,13 +1,12 @@
-package com.vincent.dialoglibrary
+package com.hjq.dialog
 
 import android.view.Gravity
 import android.view.View
 import android.widget.TextView
 import androidx.fragment.app.FragmentActivity
-import com.hjq.dialog.R
-import com.vincent.dialoglibrary.base.BaseDialog
-import com.vincent.dialoglibrary.base.BaseDialogFragment
-import com.vincent.dialoglibrary.widget.ProgressView
+import com.hjq.dialog.base.BaseDialog
+import com.hjq.dialog.base.BaseDialogFragment
+import com.hjq.dialog.widget.ProgressView
 
 
 /**
@@ -19,10 +18,10 @@ import com.vincent.dialoglibrary.widget.ProgressView
  *
  */
 object WaitDialog {
-    class Builder(activity: FragmentActivity, themeResId: Int = -1) :
+    class Builder @JvmOverloads constructor(activity: FragmentActivity, themeResId: Int = -1) :
         BaseDialogFragment.Builder<Builder>(activity, themeResId) {
-        private lateinit var mMessageView: TextView
-        private lateinit var mProgressView: ProgressView
+        private var mMessageView: TextView
+        private var mProgressView: ProgressView
 
         init {
             setContentView(R.layout.dialog_wait)

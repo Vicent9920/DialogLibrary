@@ -1,7 +1,6 @@
-package com.vincent.dialoglibrary
+package com.hjq.dialog
 
 import android.app.Dialog
-import android.content.Context
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -12,11 +11,10 @@ import androidx.annotation.NonNull
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.hjq.dialog.R
-import com.vincent.dialoglibrary.base.BaseDialog
-import com.vincent.dialoglibrary.base.BaseDialogFragment
-import com.vincent.dialoglibrary.widget.PASSWORD_COUNT
-import com.vincent.dialoglibrary.widget.PasswordView
+import com.hjq.dialog.base.BaseDialog
+import com.hjq.dialog.base.BaseDialogFragment
+import com.hjq.dialog.widget.PASSWORD_COUNT
+import com.hjq.dialog.widget.PasswordView
 import java.util.*
 
 
@@ -29,7 +27,7 @@ import java.util.*
  */
 object PayPasswordDialog {
 
-    class Builder(activity: FragmentActivity, themeResId: Int = -1) :
+    class Builder @JvmOverloads constructor(activity: FragmentActivity, themeResId: Int = -1) :
         BaseDialogFragment.Builder<Builder>(activity, themeResId),
         View.OnClickListener, OnItemClickListener {
 
@@ -39,13 +37,13 @@ object PayPasswordDialog {
         var mListener: OnListener? = null
         var mAutoDismiss = true
 
-        private lateinit var mPasswordView: PasswordView
-        private lateinit var mRecyclerView: RecyclerView
+        private var mPasswordView: PasswordView
+        private var mRecyclerView: RecyclerView
         private val mRecordList = LinkedList<String>()
-        private lateinit var mTitleView: TextView
-        private lateinit var mSubTitleView: TextView
-        private lateinit var mMoneyView: TextView
-        private lateinit var mCloseView: ImageView
+        private var mTitleView: TextView
+        private var mSubTitleView: TextView
+        private var mMoneyView: TextView
+        private var mCloseView: ImageView
 
         init {
             setContentView(R.layout.dialog_pay_password)
@@ -64,8 +62,8 @@ object PayPasswordDialog {
             mCloseView.setOnClickListener(this)
 
             mRecyclerView.layoutManager = GridLayoutManager(activity, 3)
-            val keyBoardAdapter = keyboardAdapter(activity)
-            keyBoardAdapter.setData(Arrays.asList(*KEYBOARD_TEXT))
+            val keyBoardAdapter = KeyBoardAdapter()
+            keyBoardAdapter.setData(listOf(*KEYBOARD_TEXT))
             keyBoardAdapter.listener = this
             mRecyclerView.adapter = keyBoardAdapter
         }
@@ -161,8 +159,8 @@ object PayPasswordDialog {
 
     }
 
-    private class keyboardAdapter internal constructor(context: Context) :
-        RecyclerView.Adapter<keyboardAdapter.ViewHolder>() {
+    private class KeyBoardAdapter() :
+        RecyclerView.Adapter<KeyBoardAdapter.ViewHolder>() {
 
         private var mDataSet: List<String>? = null
         var listener: OnItemClickListener? = null
@@ -174,11 +172,11 @@ object PayPasswordDialog {
         }
 
         @NonNull
-        override fun onCreateViewHolder(@NonNull parent: ViewGroup, viewType: Int): keyboardAdapter.ViewHolder {
+        override fun onCreateViewHolder(@NonNull parent: ViewGroup, viewType: Int): ViewHolder {
             return ViewHolder(parent, R.layout.item_dialog_pay_password)
         }
 
-        override fun onBindViewHolder(@NonNull holder: keyboardAdapter.ViewHolder, position: Int) {
+        override fun onBindViewHolder(@NonNull holder: ViewHolder, position: Int) {
             holder.mTextView.text = getItem(position)
 
             when (position) {

@@ -1,4 +1,4 @@
-package com.vincent.dialoglibrary
+package com.hjq.dialog
 
 import android.app.Dialog
 import android.view.Gravity
@@ -6,21 +6,20 @@ import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentActivity
-import com.hjq.dialog.R
-import com.vincent.dialoglibrary.base.BaseDialog
-import com.vincent.dialoglibrary.base.BaseDialogFragment
+import com.hjq.dialog.base.BaseDialog
+import com.hjq.dialog.base.BaseDialogFragment
 
 
 /**
  * 创建日期：2019/3/5 0005on 下午 2:29
  * 描述：
- * @author：Vincent
+ * author：Vincent
  * QQ：3332168769
  * 备注：
  */
 object MessageDialog {
 
-    class Builder @JvmOverloads constructor(activity: AppCompatActivity, themeResId: Int = -1) :
+    class Builder @JvmOverloads constructor(activity: FragmentActivity, themeResId: Int = -1) :
         BaseDialogFragment.Builder<Builder>(activity, themeResId),
         View.OnClickListener {
 
@@ -28,12 +27,12 @@ object MessageDialog {
         var mListener: OnListener? = null
         var mAutoDismiss = true // 设置点击按钮后自动消失
 
-        private lateinit var mTitleView: TextView
-        private lateinit var mMessageView: TextView
+        private var mTitleView: TextView
+        private var mMessageView: TextView
 
-        private lateinit var mCancelView: TextView
-        private lateinit var mLineView: View
-        private lateinit var mConfirmView: TextView
+        private var mCancelView: TextView
+        private var mLineView: View
+        private var mConfirmView: TextView
 
         init {
             setContentView(R.layout.dialog_message)

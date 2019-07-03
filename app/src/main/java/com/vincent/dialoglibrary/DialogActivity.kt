@@ -1,5 +1,6 @@
 package com.vincent.dialoglibrary
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.os.Bundle
 import android.os.Handler
@@ -9,19 +10,21 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentActivity
-import com.vincent.dialoglibrary.base.BaseDialog
-import com.vincent.dialoglibrary.base.BaseDialogFragment
+import com.hjq.dialog.*
+import com.hjq.dialog.base.BaseDialog
+import com.hjq.dialog.base.BaseDialogFragment
 import kotlinx.android.synthetic.main.activity_dialog.*
 
 
  class DialogActivity : AppCompatActivity() {
 
-    lateinit var mToast: Toast
+    private lateinit var mToast: Toast
+    @SuppressLint("ShowToast")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dialog)
         initEvent()
-        mToast = Toast.makeText(this,"",Toast.LENGTH_SHORT);
+        mToast = Toast.makeText(this,"",Toast.LENGTH_SHORT)
     }
 
     private fun initEvent(){
@@ -33,7 +36,7 @@ import kotlinx.android.synthetic.main.activity_dialog.*
                 .setCancel("取消") // 设置 null 表示不显示取消按钮
                 //.setAutoDismiss(false) // 设置点击按钮后不关闭对话框
                 .apply {
-                    this.mListener = object : com.vincent.dialoglibrary.MessageDialog.OnListener {
+                    this.mListener = object : MessageDialog.OnListener {
                         override fun confirm(dialog: Dialog) {
                             toast("确定了")
                         }
@@ -144,7 +147,7 @@ import kotlinx.android.synthetic.main.activity_dialog.*
                 .show()
         }
         btn_dialog_date.setOnClickListener {
-            DateDialog.Builder(this).apply { this.mListener = object :DateDialog.OnListener{
+            DateDialog.Builder(this).apply { this.mListener = object : DateDialog.OnListener{
                 override fun onSelected(dialog: Dialog, year: Int, month: Int, day: Int) {
                     toast("${year}年${month}月${day}日")
                 }
@@ -177,7 +180,7 @@ import kotlinx.android.synthetic.main.activity_dialog.*
 
     }
 
-    class Custom(activity: AppCompatActivity, themeResId: Int = -1):
+    class Custom @JvmOverloads constructor (activity: FragmentActivity, themeResId: Int = -1):
         BaseDialogFragment.Builder<Custom>(activity, themeResId)
 
     private fun toast(info:String?){

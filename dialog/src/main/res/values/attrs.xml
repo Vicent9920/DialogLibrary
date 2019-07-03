@@ -11,6 +11,7 @@
         <attr name="drawItemCount" format="integer"/>
     </declare-styleable>
 
+
     <declare-styleable name="CircularProgressDrawable">
         <attr name="cpd_padding" format="reference|dimension"/>
         <attr name="cpd_initialAngle" format="reference|float"/>

@@ -1,4 +1,4 @@
-package com.vincent.dialoglibrary
+package com.hjq.dialog
 
 import android.content.Context
 import android.util.DisplayMetrics
@@ -9,10 +9,9 @@ import android.view.WindowManager
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.FragmentActivity
-import com.hjq.dialog.R
-import com.vincent.dialoglibrary.base.BaseDialog
-import com.vincent.dialoglibrary.base.BaseDialogFragment
-import com.vincent.dialoglibrary.widget.LoopView
+import com.hjq.dialog.base.BaseDialog
+import com.hjq.dialog.base.BaseDialogFragment
+import com.hjq.dialog.widget.LoopView
 
 
 /**

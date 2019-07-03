@@ -1,8 +1,6 @@
-package com.vincent.dialoglibrary
+package com.hjq.dialog
 
 import android.app.Dialog
-import android.content.Context
-import android.text.TextUtils.isEmpty
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -12,10 +10,8 @@ import androidx.annotation.NonNull
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.hjq.dialog.R
-import com.vincent.dialoglibrary.base.BaseDialog
-import com.vincent.dialoglibrary.base.BaseDialogFragment
-import java.util.*
+import com.hjq.dialog.base.BaseDialog
+import com.hjq.dialog.base.BaseDialogFragment
 
 /**
  * 创建日期：2019/3/5 0005on 下午 1:18
@@ -26,16 +22,16 @@ import java.util.*
  */
 object MenuDialog {
 
-    class Builder(activity: FragmentActivity, themeResId: Int = -1) :
+    class Builder @JvmOverloads constructor(activity: FragmentActivity, themeResId: Int = -1) :
         BaseDialogFragment.Builder<Builder>(activity, themeResId), View.OnClickListener, OnItemClickListener {
 
 
         var mListener: OnListener? = null
         var mAutoDismiss = true
 
-        private lateinit var mRecyclerView: RecyclerView
-        private lateinit var mAdapter: MenuAdapter
-        private lateinit var mCancelView: TextView
+        private var mRecyclerView: RecyclerView
+        private var mAdapter: MenuAdapter
+        private var mCancelView: TextView
 
         init {
             setContentView(R.layout.dialog_menu)
@@ -47,7 +43,7 @@ object MenuDialog {
             mCancelView = findViewById(R.id.tv_dialog_menu_cancel)
 
             mRecyclerView.layoutManager = LinearLayoutManager(activity)
-            mAdapter = MenuAdapter(activity)
+            mAdapter = MenuAdapter()
             mAdapter.listener = this
             mRecyclerView.adapter = mAdapter
 
@@ -55,7 +51,7 @@ object MenuDialog {
         }
 
         fun setList(vararg data: String): Builder {
-            return setList(Arrays.asList(*data))
+            return setList(listOf(*data))
         }
 
         fun setList(data: List<String>): Builder {
@@ -94,7 +90,7 @@ object MenuDialog {
 
     }
 
-    private class MenuAdapter internal constructor(val context: Context) : RecyclerView.Adapter<ViewHolder>() {
+    private class MenuAdapter : RecyclerView.Adapter<ViewHolder>() {
         private var mDataSet: List<String>? = null
         var listener: OnItemClickListener? = null
         override fun getItemCount(): Int {

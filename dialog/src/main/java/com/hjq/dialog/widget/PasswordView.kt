@@ -1,4 +1,4 @@
-package com.vincent.dialoglibrary.widget
+package com.hjq.dialog.widget
 
 import android.content.Context
 import android.graphics.Canvas
@@ -16,7 +16,7 @@ import android.view.View
  *
  */
 // 密码总个数
-val PASSWORD_COUNT = 6
+const val PASSWORD_COUNT = 6
 
 class PasswordView : View {
 
@@ -24,9 +24,9 @@ class PasswordView : View {
     // 已经输入的密码个数，也就是需要显示的小黑点个数
     private var mCurrentIndex = 0
 
-    private lateinit var mPaint: Paint
-    private lateinit var mPath: Path
-    private lateinit var mPointPaint: Paint
+    private  var mPaint: Paint
+    private  var mPath: Path
+    private  var mPointPaint: Paint
 
     //密码框边界线的颜色值
     private val mStrokeColor = -0x131314
@@ -79,10 +79,10 @@ class PasswordView : View {
     }
 
     private fun measureWidth(measureSpec: Int): Int {
-        val mode = View.MeasureSpec.getMode(measureSpec)
-        val size = View.MeasureSpec.getSize(measureSpec)
+        val mode = MeasureSpec.getMode(measureSpec)
+        val size = MeasureSpec.getSize(measureSpec)
 
-        return if (mode == View.MeasureSpec.EXACTLY) {
+        return if (mode == MeasureSpec.EXACTLY) {
             size
         } else {
             mItemWidth * PASSWORD_COUNT
@@ -90,18 +90,18 @@ class PasswordView : View {
     }
 
     private fun measureHeight(measureSpec: Int): Int {
-        val mode = View.MeasureSpec.getMode(measureSpec)
-        val size = View.MeasureSpec.getSize(measureSpec)
+        val mode = MeasureSpec.getMode(measureSpec)
+        val size = MeasureSpec.getSize(measureSpec)
 
-        return if (mode == View.MeasureSpec.EXACTLY) {
+        return if (mode == MeasureSpec.EXACTLY) {
             size
         } else {
             mItemHeight
         }
     }
 
-    protected override fun onDraw(canvas: Canvas) {
-        mPaint.setStrokeWidth(5f)
+     override fun onDraw(canvas: Canvas) {
+         mPaint.strokeWidth = 5f
         canvas.drawPath(mPath, mPaint)
 
         drawDivide(canvas)
@@ -112,7 +112,7 @@ class PasswordView : View {
      * 画单个的分割线
      */
     private fun drawDivide(canvas: Canvas) {
-        mPaint.setStrokeWidth(3f)
+        mPaint.strokeWidth = 3f
         for (index in 1 until PASSWORD_COUNT) {
             canvas.drawLine(mItemWidth * 1f * index, 0f, mItemWidth * index * 1f, mItemHeight * 1f, mPaint)
         }
@@ -122,7 +122,7 @@ class PasswordView : View {
      * 绘制中间的小黑点
      */
     private fun drawBlackPoint(canvas: Canvas) {
-        if (mCurrentIndex === 0) {
+        if (mCurrentIndex == 0) {
             return
         }
         for (i in 1..mCurrentIndex) {
@@ -143,7 +143,7 @@ class PasswordView : View {
         invalidate()
     }
 
-    fun dp2px(dp: Float): Int {
+    private fun dp2px(dp: Float): Int {
         val scale = context.resources.displayMetrics.density
         return (dp * scale + 0.5f).toInt()
     }

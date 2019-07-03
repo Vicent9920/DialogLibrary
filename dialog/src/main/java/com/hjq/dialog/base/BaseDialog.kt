@@ -1,12 +1,14 @@
-package com.vincent.dialoglibrary.base
+package com.hjq.dialog.base
 
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Context
 import android.content.DialogInterface
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.util.SparseArray
+import android.util.SparseIntArray
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -15,7 +17,9 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatDialog
+import androidx.core.content.ContextCompat
 import com.hjq.dialog.R
+import java.lang.RuntimeException
 
 
 /**
@@ -26,15 +30,8 @@ import com.hjq.dialog.R
  * <p>版本号：1<p>
  *
  */
-class BaseDialog(context: Context?, val themeResId: Int = R.style.BaseDialogStyle) :
+class BaseDialog(context: Context?,  themeResId: Int = R.style.BaseDialogStyle) :
     AppCompatDialog(context, themeResId) {
-
-    var mCancelable = true
-        set(value) {
-            super.setCancelable(value)
-            field = value
-        }
-
 
     open class Builder<B : Builder<B>> constructor(val mContext: Context, val themeResId: Int = -1) {
          lateinit var mDialog: BaseDialog
@@ -54,7 +51,7 @@ class BaseDialog(context: Context?, val themeResId: Int = R.style.BaseDialogStyl
         var mCancelable = true
 
         private val mTextArray = SparseArray<CharSequence>()
-        private val mVisibilityArray = SparseArray<Int>()
+        private val mVisibilityArray = SparseIntArray()
         private val mBackgroundArray = SparseArray<Drawable>()
         private val mImageArray = SparseArray<Drawable>()
         private val mClickArray = SparseArray<OnClickListener<View>>()
@@ -83,7 +80,7 @@ class BaseDialog(context: Context?, val themeResId: Int = R.style.BaseDialogStyl
          * 销毁当前 Dialog（仅供子类调用）
          */
         open fun dismiss() {
-            mDialog?.dismiss()
+            mDialog.dismiss()
         }
 
 
@@ -107,7 +104,7 @@ class BaseDialog(context: Context?, val themeResId: Int = R.style.BaseDialogStyl
         /**
          * 设置布局
          */
-        fun setContentView(layoutId: View): B {
+         fun setContentView(layoutId: View): B {
             mContentView = layoutId
             return this as B
         }
@@ -123,8 +120,7 @@ class BaseDialog(context: Context?, val themeResId: Int = R.style.BaseDialogStyl
          * 设置重心位置
          */
         fun setGravity(gravity: Int): B {
-            var gravity = Gravity.getAbsoluteGravity(gravity, mContext.resources.configuration.layoutDirection)
-            mGravity = gravity
+            mGravity = Gravity.getAbsoluteGravity(gravity, mContext.resources.configuration.layoutDirection)
             if (mAnimations == -1) {
                 when (mGravity) {
                     Gravity.TOP -> mAnimations = AnimStyle.TOP
@@ -179,7 +175,8 @@ class BaseDialog(context: Context?, val themeResId: Int = R.style.BaseDialogStyl
          * 设置设置背景
          */
         fun setBackground(@IdRes id: Int, resId: Int): B {
-            return setBackground(id, mContext.resources.getDrawable(resId))
+            ContextCompat.getDrawable(mContext,resId)?:throw RuntimeException("resId is wrong")
+            return setBackground(id, ContextCompat.getDrawable(mContext,resId)!!)
         }
 
         /**
@@ -216,6 +213,7 @@ class BaseDialog(context: Context?, val themeResId: Int = R.style.BaseDialogStyl
         /**
          * 创建
          */
+        @SuppressLint("ObsoleteSdkInt")
         open fun create(): BaseDialog {
 
             val layoutParams = mContentView.layoutParams
@@ -260,14 +258,14 @@ class BaseDialog(context: Context?, val themeResId: Int = R.style.BaseDialogStyl
             }
 
             // 设置参数
-            val params = mDialog.window.attributes
-            params.width = mWidth
-            params.height = mHeight
-            params.gravity = mGravity
-            params.windowAnimations = mAnimations
-            params.horizontalMargin = mHorizontalMargin
-            params.verticalMargin = mVerticalMargin
-            mDialog.window.attributes = params
+            val params = mDialog.window?.attributes
+            params?.width = mWidth
+            params?.height = mHeight
+            params?.gravity = mGravity
+            params?.windowAnimations = mAnimations
+            params?.horizontalMargin = mHorizontalMargin
+            params?.verticalMargin = mVerticalMargin
+            mDialog.window?.attributes = params
 
             // 设置文本
             for (i in 0 until mTextArray.size()) {
@@ -282,8 +280,7 @@ class BaseDialog(context: Context?, val themeResId: Int = R.style.BaseDialogStyl
             // 设置背景
             for (i in 0 until mBackgroundArray.size()) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                    mContentView.findViewById<View>(mBackgroundArray.keyAt(i))
-                        .setBackground(mBackgroundArray.valueAt(i))
+                    mContentView.findViewById<View>(mBackgroundArray.keyAt(i)).background = mBackgroundArray.valueAt(i)
                 }
             }
 
@@ -296,7 +293,7 @@ class BaseDialog(context: Context?, val themeResId: Int = R.style.BaseDialogStyl
             for (i in 0 until mClickArray.size()) {
                 ViewClickHandler(
                     mDialog,
-                    mContentView.findViewById<View>(mClickArray.keyAt(i)),
+                    mContentView.findViewById(mClickArray.keyAt(i)),
                     mClickArray.valueAt(i)
                 )
             }

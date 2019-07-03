@@ -1,12 +1,11 @@
-package com.vincent.dialoglibrary
+package com.hjq.dialog
 
 import android.view.Gravity
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.FragmentActivity
-import com.hjq.dialog.R
-import com.vincent.dialoglibrary.base.BaseDialog
-import com.vincent.dialoglibrary.base.BaseDialogFragment
+import com.hjq.dialog.base.BaseDialog
+import com.hjq.dialog.base.BaseDialogFragment
 
 
 /**
@@ -19,10 +18,10 @@ import com.vincent.dialoglibrary.base.BaseDialogFragment
  */
 object ToastDialog {
 
-    class Builder constructor(activity: FragmentActivity, themeResId: Int = -1) :
+    class Builder @JvmOverloads constructor(activity: FragmentActivity, themeResId: Int = -1) :
         BaseDialogFragment.Builder<Builder>(activity, themeResId), Runnable {
-        private lateinit var mMessageView: TextView
-        private lateinit var mIconView: ImageView
+        private  var mMessageView: TextView
+        private  var mIconView: ImageView
         private lateinit var mType: Type
 
         init {
@@ -38,9 +37,9 @@ object ToastDialog {
         fun setType(type: Type): Builder {
             mType = type
             when (type) {
-                Type.FINISH -> mIconView.setImageResource(R.mipmap.ic_dialog_tip_finish)
-                Type.ERROR -> mIconView.setImageResource(R.mipmap.ic_dialog_tip_error)
-                Type.WARN -> mIconView.setImageResource(R.mipmap.ic_dialog_tip_warning)
+                ToastDialog.Type.FINISH -> mIconView.setImageResource(R.mipmap.ic_dialog_tip_finish)
+                ToastDialog.Type.ERROR -> mIconView.setImageResource(R.mipmap.ic_dialog_tip_error)
+                ToastDialog.Type.WARN -> mIconView.setImageResource(R.mipmap.ic_dialog_tip_warning)
             }
             return this
         }

@@ -1,4 +1,4 @@
-package com.vincent.dialoglibrary.widget
+package com.hjq.dialog.widget
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -15,6 +15,9 @@ import com.hjq.dialog.R
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
+import kotlin.math.abs
+import kotlin.math.cos
+import kotlin.math.sin
 
 
 /**
@@ -31,7 +34,7 @@ class LoopView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
 
     private var mListener: LoopScrollListener? = null
 
-    private var mData: List<String>? = null
+    private lateinit var mData: List<String>
 
     private val mTopBottomTextPaint: Paint
     private val mCenterTextPaint: Paint
@@ -65,7 +68,7 @@ class LoopView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
 
     private var mItemHeight: Float = 0.toFloat()
     private var mDrawItemsCount: Int = 0
-    private var mItemTempArray: Array<String?>? = null
+    private lateinit var mItemTempArray: Array<String>
 
     private var mCircularDiameter: Float = 0.toFloat()
     private var mCircularRadius: Float = 0.toFloat()
@@ -88,7 +91,7 @@ class LoopView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
                 ).toInt()
             )
             mDrawItemsCount = array.getInt(R.styleable.LoopView_drawItemCount, 7)
-            mItemTempArray = arrayOfNulls(mDrawItemsCount)
+            mItemTempArray = arrayOf()
             array.recycle()
         }
 
@@ -98,7 +101,7 @@ class LoopView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         mCenterTextPaint = Paint()
         mCenterLinePaint = Paint()
 
-        setLayerType(View.LAYER_TYPE_SOFTWARE, null)
+        setLayerType(LAYER_TYPE_SOFTWARE, null)
 
         mGestureDetector = GestureDetector(context, LoopViewGestureListener())
         mGestureDetector.setIsLongpressEnabled(false)
@@ -108,23 +111,23 @@ class LoopView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         var widthSpec = widthMeasureSpec
         var heightSpec = heightMeasureSpec
 
-        when (View.MeasureSpec.getMode(widthSpec)) {
-            View.MeasureSpec.AT_MOST, View.MeasureSpec.UNSPECIFIED -> widthSpec =
-                View.MeasureSpec.makeMeasureSpec(mMaxTextWidth, View.MeasureSpec.EXACTLY)
-            View.MeasureSpec.EXACTLY -> {
+        when (MeasureSpec.getMode(widthSpec)) {
+            MeasureSpec.AT_MOST, MeasureSpec.UNSPECIFIED -> widthSpec =
+                MeasureSpec.makeMeasureSpec(mMaxTextWidth, MeasureSpec.EXACTLY)
+            MeasureSpec.EXACTLY -> {
             }
         }
 
-        when (View.MeasureSpec.getMode(heightSpec)) {
-            View.MeasureSpec.AT_MOST, View.MeasureSpec.UNSPECIFIED -> heightSpec =
-                View.MeasureSpec.makeMeasureSpec(mCircularDiameter.toInt(), View.MeasureSpec.EXACTLY)
-            View.MeasureSpec.EXACTLY -> {
+        when (MeasureSpec.getMode(heightSpec)) {
+            MeasureSpec.AT_MOST, MeasureSpec.UNSPECIFIED -> heightSpec =
+                MeasureSpec.makeMeasureSpec(mCircularDiameter.toInt(), MeasureSpec.EXACTLY)
+            MeasureSpec.EXACTLY -> {
             }
         }
         setMeasuredDimension(widthSpec, heightSpec)
 
-        val width = View.MeasureSpec.getSize(widthSpec)
-        val height = View.MeasureSpec.getSize(heightSpec)
+        val width = MeasureSpec.getSize(widthSpec)
+        val height = MeasureSpec.getSize(heightSpec)
 
         mItemHeight = mLineSpacingMultiplier * mMaxTextHeight
         // auto calculate the text's left/right value when draw
@@ -138,24 +141,22 @@ class LoopView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
 
     override fun onDraw(canvas: Canvas) {
 
-        if (mData == null) return
-
         // the length of single item is mItemHeight
         val mChangingItem = (mTotalScrollY / mItemHeight).toInt()
-        mCurrentIndex = mInitPosition + mChangingItem % mData!!.size
+        mCurrentIndex = mInitPosition + mChangingItem % mData.size
         if (!mCanLoop) { // can loop
             if (mCurrentIndex < 0) {
                 mCurrentIndex = 0
             }
-            if (mCurrentIndex > mData!!.size - 1) {
-                mCurrentIndex = mData!!.size - 1
+            if (mCurrentIndex > mData.size - 1) {
+                mCurrentIndex = mData.size - 1
             }
         } else { // can not loop
             if (mCurrentIndex < 0) {
-                mCurrentIndex += mData!!.size
+                mCurrentIndex += mData.size
             }
-            if (mCurrentIndex > mData!!.size - 1) {
-                mCurrentIndex -= mData!!.size
+            if (mCurrentIndex > mData.size - 1) {
+                mCurrentIndex -= mData.size
             }
         }
 
@@ -166,16 +167,16 @@ class LoopView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
             when {
                 mCanLoop -> {
                     if (templateItem < 0) {
-                        templateItem += mData!!.size
+                        templateItem += mData.size
                     }
-                    if (templateItem > mData!!.size - 1) {
-                        templateItem -= mData!!.size
+                    if (templateItem > mData.size - 1) {
+                        templateItem -= mData.size
                     }
-                    mItemTempArray!![count] = mData!![templateItem]
+                    mItemTempArray[count] = mData[templateItem]
                 }
-                templateItem < 0 -> mItemTempArray!![count] = ""
-                templateItem > mData!!.size - 1 -> mItemTempArray!![count] = ""
-                else -> mItemTempArray!![count] = mData!![templateItem]
+                templateItem < 0 -> mItemTempArray[count] = ""
+                templateItem > mData.size - 1 -> mItemTempArray[count] = ""
+                else -> mItemTempArray[count] = mData[templateItem]
             }
             count++
         }
@@ -188,31 +189,21 @@ class LoopView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         val changingLeftY = (mTotalScrollY % mItemHeight).toInt()
         while (count < mDrawItemsCount) {
             canvas.save()
-            // L= å * r -> å = rad
             val itemHeight = mMaxTextHeight * mLineSpacingMultiplier
-            // get radian  L = (itemHeight * count - changingLeftY),r = mCircularRadius
             val radian = ((itemHeight * count - changingLeftY) / mCircularRadius).toDouble()
-            // a = rad * 180 / π
-            // get angle
             val angle = (radian * 180 / Math.PI).toFloat()
-
-            // when angle >= 180 || angle <= 0 don't draw
             if (angle >= 180f || angle <= 0f) {
                 canvas.restore()
             } else {
-                // translateY = r - r*cos(å) -
-                // (Math.sin(radian) * mMaxTextHeight) / 2 this is text offset
                 val translateY =
-                    (mCircularRadius.toDouble() - Math.cos(radian) * mCircularRadius - Math.sin(radian) * mMaxTextHeight / 2).toFloat() + mVerticalPadding
+                    (mCircularRadius.toDouble() - cos(radian) * mCircularRadius - sin(radian) * mMaxTextHeight / 2).toFloat() + mVerticalPadding
                 canvas.translate(0.0f, translateY)
-                // scale offset = Math.sin(radian) -> 0 - 1
-                canvas.scale(1.0f, Math.sin(radian).toFloat())
+                canvas.scale(1.0f, sin(radian).toFloat())
                 if (translateY <= mTopLineY) {
-                    // draw text y between 0 -> mTopLineY,include incomplete text
                     canvas.save()
                     canvas.clipRect(0f, 0f, measuredWidth.toFloat(), mTopLineY - translateY)
                     canvas.drawText(
-                        mItemTempArray!![count],
+                        mItemTempArray[count],
                         mHorizontalPadding,
                         mMaxTextHeight.toFloat(),
                         mTopBottomTextPaint
@@ -221,7 +212,7 @@ class LoopView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
                     canvas.save()
                     canvas.clipRect(0f, mTopLineY - translateY, measuredWidth.toFloat(), itemHeight.toInt().toFloat())
                     canvas.drawText(
-                        mItemTempArray!![count],
+                        mItemTempArray[count],
                         mHorizontalPadding,
                         mMaxTextHeight.toFloat(),
                         mCenterTextPaint
@@ -232,7 +223,7 @@ class LoopView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
                     canvas.save()
                     canvas.clipRect(0f, 0f, measuredWidth.toFloat(), mBottomLineY - translateY)
                     canvas.drawText(
-                        mItemTempArray!![count],
+                        mItemTempArray[count],
                         mHorizontalPadding,
                         mMaxTextHeight.toFloat(),
                         mCenterTextPaint
@@ -246,7 +237,7 @@ class LoopView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
                         itemHeight.toInt().toFloat()
                     )
                     canvas.drawText(
-                        mItemTempArray!![count],
+                        mItemTempArray[count],
                         mHorizontalPadding,
                         mMaxTextHeight.toFloat(),
                         mTopBottomTextPaint
@@ -256,13 +247,13 @@ class LoopView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
                     // draw center complete text
                     canvas.clipRect(0, 0, measuredWidth, itemHeight.toInt())
                     canvas.drawText(
-                        mItemTempArray!![count],
+                        mItemTempArray[count],
                         mHorizontalPadding,
                         mMaxTextHeight.toFloat(),
                         mCenterTextPaint
                     )
                     // center one indicate selected item
-                    selectedItem = mData!!.indexOf(mItemTempArray!![count])
+                    selectedItem = mData.indexOf(mItemTempArray[count])
                 }
                 canvas.restore()
             }
@@ -307,9 +298,8 @@ class LoopView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
 
     fun setInitPosition(initPosition: Int) {
         var position = initPosition
-        mData ?: return
-        if (position > mData!!.size) {
-            position = mData!!.size - 1
+        if (position > mData.size) {
+            position = mData.size - 1
         }
         mInitPosition = position
         invalidate()
@@ -326,10 +316,6 @@ class LoopView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
      */
     fun setData(data: List<String>) {
         mData = data
-
-        if (mData == null) {
-            throw IllegalArgumentException("data list must not be null!")
-        }
         mTopBottomTextPaint.color = mTopBottomTextColor
         mTopBottomTextPaint.isAntiAlias = true
         mTopBottomTextPaint.typeface = Typeface.MONOSPACE
@@ -348,8 +334,8 @@ class LoopView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
 
         // measureTextWidthHeight
         val rect = Rect()
-        for (i in mData!!.indices) {
-            val text = mData!![i]
+        for (i in mData.indices) {
+            val text = mData[i]
             mCenterTextPaint.getTextBounds(text, 0, text.length, rect)
 
             val textWidth = rect.width()
@@ -376,11 +362,11 @@ class LoopView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
         mCircularDiameter = (halfCircumference * 2 / Math.PI).toInt().toFloat()
         // the radius of circular
         mCircularRadius = (halfCircumference / Math.PI).toInt().toFloat()
-        // FIXME: 7/8/16  通过控件的高度来计算圆弧的周长
+        //  7/8/16  通过控件的高度来计算圆弧的周长
 
         if (mInitPosition == -1) {
             mInitPosition = if (mCanLoop) {
-                (mData!!.size + 1) / 2
+                (mData.size + 1) / 2
             } else {
                 0
             }
@@ -410,7 +396,7 @@ class LoopView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
             mExecutor.scheduleWithFixedDelay(FlingRunnable(velocityY), 0, velocityFling.toLong(), TimeUnit.MILLISECONDS)
     }
 
-    internal inner class LoopViewGestureListener : android.view.GestureDetector.SimpleOnGestureListener() {
+    internal inner class LoopViewGestureListener : GestureDetector.SimpleOnGestureListener() {
 
         override fun onDown(motionevent: MotionEvent): Boolean {
             cancelSchedule()
@@ -431,7 +417,7 @@ class LoopView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
                     mTotalScrollY = initPositionStartY
                 }
 
-                val circleLength = ((mData!!.size - 1 - mInitPosition).toFloat() * mItemHeight).toInt()
+                val circleLength = ((mData.size - 1 - mInitPosition).toFloat() * mItemHeight).toInt()
                 if (mTotalScrollY >= circleLength) {
                     mTotalScrollY = circleLength
                 }
@@ -485,7 +471,7 @@ class LoopView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
                     1
                 }
             }
-            if (Math.abs(realTotalOffset) <= 0) {
+            if (abs(realTotalOffset) <= 0) {
                 cancelSchedule()
                 post {
                     if (mListener != null) {
@@ -523,7 +509,7 @@ class LoopView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
                     velocityY
                 }
             }
-            if (Math.abs(velocity) in 0.0f..20f) {
+            if (abs(velocity) in 0.0f..20f) {
                 cancelSchedule()
                 post { startSmoothScrollTo() }
                 return
@@ -535,8 +521,8 @@ class LoopView @JvmOverloads constructor(context: Context, attrs: AttributeSet? 
                 if (mTotalScrollY <= ((-mInitPosition).toFloat() * itemHeight).toInt()) {
                     velocity = 40f
                     mTotalScrollY = ((-mInitPosition).toFloat() * itemHeight).toInt()
-                } else if (mTotalScrollY >= ((mData!!.size - 1 - mInitPosition).toFloat() * itemHeight).toInt()) {
-                    mTotalScrollY = ((mData!!.size - 1 - mInitPosition).toFloat() * itemHeight).toInt()
+                } else if (mTotalScrollY >= ((mData.size - 1 - mInitPosition).toFloat() * itemHeight).toInt()) {
+                    mTotalScrollY = ((mData.size - 1 - mInitPosition).toFloat() * itemHeight).toInt()
                     velocity = -40f
                 }
             }

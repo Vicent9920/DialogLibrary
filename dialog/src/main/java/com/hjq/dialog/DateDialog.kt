@@ -1,10 +1,9 @@
-package com.vincent.dialoglibrary
+package com.hjq.dialog
 
 
 import android.app.Dialog
 import androidx.fragment.app.FragmentActivity
-import com.hjq.dialog.R
-import com.vincent.dialoglibrary.widget.LoopView
+import com.hjq.dialog.widget.LoopView
 import java.util.*
 
 
@@ -19,7 +18,7 @@ private const val EDN_YEAR = 2022
 
 object DateDialog : AbsLooperDialog() {
 
-    class Builder(activity: FragmentActivity) : AbsLooperDialog.Builder(activity),
+    class Builder @JvmOverloads constructor(activity: FragmentActivity) : AbsLooperDialog.Builder(activity),
         LoopView.LoopScrollListener {
 
         private val mYearView: LoopView

@@ -1,3 +1,4 @@
+@file:Suppress("unused","RtlHardcoded")
 package com.hjq.dialog
 
 import android.view.Gravity

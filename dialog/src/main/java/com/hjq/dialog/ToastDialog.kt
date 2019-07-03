@@ -1,11 +1,11 @@
+@file:Suppress("unused","RtlHardcoded")
 package com.hjq.dialog
 
 import android.view.Gravity
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.fragment.app.FragmentActivity
 import com.hjq.dialog.base.BaseDialog
 import com.hjq.dialog.base.BaseDialogFragment
+import kotlinx.android.synthetic.main.dialog_toast.view.*
 
 
 /**
@@ -20,26 +20,23 @@ object ToastDialog {
 
     class Builder @JvmOverloads constructor(activity: FragmentActivity, themeResId: Int = -1) :
         BaseDialogFragment.Builder<Builder>(activity, themeResId), Runnable {
-        private  var mMessageView: TextView
-        private  var mIconView: ImageView
+
         private lateinit var mType: Type
 
         init {
-            setContentView(R.layout.dialog_toast);
-            setGravity(Gravity.CENTER);
+            setContentView(R.layout.dialog_toast)
+            setGravity(Gravity.CENTER)
             mAnimations = BaseDialog.AnimStyle.TOAST
             mCancelable = false
-
-            mMessageView = findViewById(R.id.tv_dialog_toast_message);
-            mIconView = findViewById(R.id.iv_dialog_toast_icon);
         }
 
         fun setType(type: Type): Builder {
             mType = type
+
             when (type) {
-                ToastDialog.Type.FINISH -> mIconView.setImageResource(R.mipmap.ic_dialog_tip_finish)
-                ToastDialog.Type.ERROR -> mIconView.setImageResource(R.mipmap.ic_dialog_tip_error)
-                ToastDialog.Type.WARN -> mIconView.setImageResource(R.mipmap.ic_dialog_tip_warning)
+                ToastDialog.Type.FINISH -> mContentView.iv_dialog_toast_icon.setImageResource(R.mipmap.ic_dialog_tip_finish)
+                ToastDialog.Type.ERROR -> mContentView.iv_dialog_toast_icon.setImageResource(R.mipmap.ic_dialog_tip_error)
+                ToastDialog.Type.WARN -> mContentView.iv_dialog_toast_icon.setImageResource(R.mipmap.ic_dialog_tip_warning)
             }
             return this
         }
@@ -49,28 +46,25 @@ object ToastDialog {
         }
 
         fun setMessage(text: CharSequence): Builder {
-            mMessageView.text = text
+            mContentView.tv_dialog_toast_message.text = text
             return this
         }
 
         override fun show(): BaseDialog {
-            // 如果显示的类型为空就抛出异常
-            if (mType == null) {
-                throw IllegalArgumentException("The display type must be specified")
-            }
+
             // 如果内容为空就抛出异常
-            if ("" == mMessageView.text.toString()) {
+            if ("" == mContentView.tv_dialog_toast_message.text.toString()) {
                 throw IllegalArgumentException("Dialog message not null")
             }
             // 延迟自动关闭
-            mMessageView.postDelayed(this, 3000)
+            mContentView.tv_dialog_toast_message.postDelayed(this, 3000)
             return super.show()
         }
 
 
         override fun run() {
-            if (mDialog != null && mDialog.isShowing()) {
-                dismiss();
+            if (mDialog.isShowing) {
+                dismiss()
             }
         }
 

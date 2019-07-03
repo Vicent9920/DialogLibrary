@@ -1,3 +1,4 @@
+@file:Suppress("unused","UNCHECKED_CAST","RtlHardcoded")
 package com.hjq.dialog.base
 
 
@@ -34,18 +35,28 @@ class BaseDialog(context: Context?,  themeResId: Int = R.style.BaseDialogStyle) 
     AppCompatDialog(context, themeResId) {
 
     open class Builder<B : Builder<B>> constructor(val mContext: Context, val themeResId: Int = -1) {
-         lateinit var mDialog: BaseDialog
+
+        /**
+         * 设置布局
+         */
+         fun setContentView(layoutId: View): B {
+            mContentView = layoutId
+            return this as B
+        }
+
+
+        lateinit var mDialog: BaseDialog
 
 
         // Dialog 布局
         lateinit var mContentView: View
 
         // Dialog Cancel 监听
-         var mOnCancelListener: DialogInterface.OnCancelListener? = null
+        var mOnCancelListener: DialogInterface.OnCancelListener? = null
         // Dialog Dismiss 监听
-         var mOnDismissListener: DialogInterface.OnDismissListener? = null
+        var mOnDismissListener: DialogInterface.OnDismissListener? = null
         // Dialog Key 监听
-         var mOnKeyListener: DialogInterface.OnKeyListener? = null
+        open var mOnKeyListener: DialogInterface.OnKeyListener? = null
 
         // 点击空白是否能够取消  默认点击阴影可以取消
         var mCancelable = true
@@ -59,12 +70,12 @@ class BaseDialog(context: Context?,  themeResId: Int = R.style.BaseDialogStyle) 
         // 主题
         private val mThemeResId = -1
         // 动画
-         var mAnimations = -1
+        var mAnimations = -1
         // 位置
         private var mGravity = Gravity.CENTER
         // 宽度和高度
-         var mWidth = ViewGroup.LayoutParams.WRAP_CONTENT
-         var mHeight = ViewGroup.LayoutParams.WRAP_CONTENT
+        var mWidth = ViewGroup.LayoutParams.WRAP_CONTENT
+        var mHeight = ViewGroup.LayoutParams.WRAP_CONTENT
         // 垂直和水平边距
         private val mVerticalMargin: Float = 0f
         private val mHorizontalMargin: Float = 0f
@@ -99,14 +110,6 @@ class BaseDialog(context: Context?,  themeResId: Int = R.style.BaseDialogStyle) 
         protected fun sp2px(spValue: Float): Int {
             val fontScale = mContext.resources.displayMetrics.scaledDensity
             return (spValue * fontScale + 0.5f).toInt()
-        }
-
-        /**
-         * 设置布局
-         */
-         fun setContentView(layoutId: View): B {
-            mContentView = layoutId
-            return this as B
         }
 
         /**
@@ -191,7 +194,8 @@ class BaseDialog(context: Context?,  themeResId: Int = R.style.BaseDialogStyle) 
          * 设置设置背景
          */
         fun setImageDrawable(@IdRes id: Int, resId: Int): B {
-            return setBackground(id, mContext.resources.getDrawable(resId))
+            ContextCompat.getDrawable(mContext,resId)?:throw RuntimeException("resId is worng")
+            return setBackground(id, ContextCompat.getDrawable(mContext,resId)!!)
         }
 
         /**
@@ -274,7 +278,7 @@ class BaseDialog(context: Context?,  themeResId: Int = R.style.BaseDialogStyle) 
 
             // 设置可见状态
             for (i in 0 until mVisibilityArray.size()) {
-                mContentView.findViewById<View>(mVisibilityArray.keyAt(i)).setVisibility(mVisibilityArray.valueAt(i))
+                mContentView.findViewById<View>(mVisibilityArray.keyAt(i)).visibility = mVisibilityArray.valueAt(i)
             }
 
             // 设置背景

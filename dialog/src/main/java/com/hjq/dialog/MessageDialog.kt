@@ -1,10 +1,11 @@
+@file:Suppress("unused","RtlHardcoded")
+
 package com.hjq.dialog
 
 import android.app.Dialog
 import android.view.Gravity
 import android.view.View
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentActivity
 import com.hjq.dialog.base.BaseDialog
 import com.hjq.dialog.base.BaseDialogFragment

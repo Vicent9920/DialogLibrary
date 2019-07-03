@@ -1,3 +1,4 @@
+@file:Suppress("unused","RtlHardcoded")
 package com.hjq.dialog.base
 
 import android.app.Dialog

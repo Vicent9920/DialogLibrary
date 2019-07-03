@@ -1,3 +1,4 @@
+@file:Suppress("unused","RtlHardcoded")
 package com.hjq.dialog.widget
 
 import android.annotation.SuppressLint
